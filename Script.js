@@ -172,7 +172,8 @@ function draw() {
       if (dist < 180) {
         ctx.beginPath();
         ctx.moveTo(p.x, p.y);
-
+     console.log();
+     
         const cpX = (p.x + ghost.x) / 2 + (Math.random() - 0.5) * 50;
         const cpY = (p.y + ghost.y) / 2 + (Math.random() - 0.5) * 50;
 
