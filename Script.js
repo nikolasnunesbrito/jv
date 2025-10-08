@@ -1,105 +1,65 @@
- 
-     let historico = [];
+let expressao = "";
+let isOpen = true;
 
-     function Consulta() 
+// Insere número ou operador no display
+function insertNumber(valor) {
+  const display = document.getElementById("display");
 
-     {   let ultimas = historico.slice(-3); 
-         let texto = "Últimas consultas:\n";
+  // Substitui símbolos visuais por operadores reais
+  if (valor === '÷') valor = '/';
+  if (valor === 'X') valor = '*';
+  if (valor === ',') valor = '.';
 
-        for (let i = 0; i < ultimas.length; i++) {
-        texto += ultimas[i] + "\n";
-        }
-        
-       document.getElementById("consulta").value = ultimos.join("\n");
-       
-     }
+  expressao += valor;
+  display.value = expressao;
+}
 
-    function soma() {
-    let valor1 = document.getElementById("valor1").value;
-    let valor2 = document.getElementById("valor2").value;
+// Alterna entre abrir e fechar parênteses
+function handleParenthesisClick() {
+  const display = document.getElementById("display");
+  expressao += isOpen ? '(' : ')';
+  isOpen = !isOpen;
+  display.value = expressao;
+}
 
-    if (valor1.trim() === "" || valor2.trim() === "") {
-        document.getElementById("resultado").value = "Preencha os dois campos!";
-        return;
-    }
+// Limpa tudo
+function limpar() {
+  expressao = "";
+  document.getElementById("display").value = "";
+}
 
-    valor1 = Number(valor1);
-    valor2 = Number(valor2);
+// Calcula a expressão
+function calcular() {
+  const display = document.getElementById("display");
 
-    if (isNaN(valor1) || isNaN(valor2)) {
-        document.getElementById("resultado").value = "Digite dois números válidos!";
-        return;
-    }
+  try {
+    // Converte porcentagem: 10% → (10/100)
+    let expr = expressao.replace(/(\d+(\.\d+)?)%/g, '($1/100)');
 
-    let resultado = valor1 + valor2;
-    historico.push(valor1 + " + " + valor2 + " = " + resultado);
-    document.getElementById("resultado").value = resultado;
+    // Avalia a expressão
+    const resultado = eval(expr);
+    display.value = resultado;
+    expressao = resultado.toString();
+  } catch {
+    display.value = "Erro";
+    expressao = "";
   }
-     
-     function subtracao() {
-    let valor1 = document.getElementById("valor1").value;
-    let valor2 = document.getElementById("valor2").value;
-
-    if (valor1.trim() === "" || valor2.trim() === "") {
-        document.getElementById("resultado").value = "Preencha os dois campos!";
-        return;
-    }
-
-    valor1 = Number(valor1);
-    valor2 = Number(valor2);
-
-    if (isNaN(valor1) || isNaN(valor2)) {
-        document.getElementById("resultado").value = "Digite dois números válidos!";
-        return;
-    }
-
-    let resultado = valor1 - valor2;
-    historico.push(valor1 + " + " + valor2 + " = " + resultado);
-    document.getElementById("resultado").value = resultado;
 }
-     
-     function multiplicacao() {
-    let valor1 = document.getElementById("valor1").value;
-    let valor2 = document.getElementById("valor2").value;
 
-    if (valor1.trim() === "" || valor2.trim() === "") {
-        document.getElementById("resultado").value = "Preencha os dois campos!";
-        return;
-    }
+// Ativa o botão C
+document.getElementById("c").onclick = limpar;
 
-    valor1 = Number(valor1);
-    valor2 = Number(valor2);
+// Permite usar Backspace no teclado
+document.addEventListener("keydown", function(event) {
+  const display = document.getElementById("display");
 
-    if (isNaN(valor1) || isNaN(valor2)) {
-        document.getElementById("resultado").value = "Digite dois números válidos!";
-        return;
-    }
+  if (event.key === "Backspace") {
+    expressao = expressao.slice(0, -1);
+    display.value = expressao;
+    event.preventDefault();
+  }
+});
 
-    let resultado = valor1 * valor2;
-    historico.push(valor1 + " + " + valor2 + " = " + resultado);
-    document.getElementById("resultado").value = resultado;
-}
-     function divisao() {
-    let valor1 = document.getElementById("valor1").value;
-    let valor2 = document.getElementById("valor2").value;
-
-    if (valor1.trim() === "" || valor2.trim() === "") {
-        document.getElementById("resultado").value = "Preencha os dois campos!";
-        return;
-    }
-
-    valor1 = Number(valor1);
-    valor2 = Number(valor2);
-
-    if (isNaN(valor1) || isNaN(valor2)) {
-        document.getElementById("resultado").value = "Digite dois números válidos!";
-        return;
-    }
-
-    let resultado = valor1 / valor2;
-    historico.push(valor1 + " + " + valor2 + " = " + resultado);
-    document.getElementById("resultado").value = resultado;
-}
 
 const canvas = document.getElementById("fundo");
 const ctx = canvas.getContext("2d");
@@ -136,13 +96,13 @@ window.addEventListener("touchmove", e => {
 });
 
 const particles = [];
-const numParticles = 250;
+const numParticles = 300;
 
 for (let i = 0; i < numParticles; i++) {
   particles.push({
     x: Math.random() * canvas.width,
     y: Math.random() * canvas.height,
-    radius: 4,
+    radius: 2,
     vx: (Math.random() - 0.5) * 1.5,
     vy: (Math.random() - 0.5) * 1.5
   });
@@ -155,12 +115,11 @@ function draw() {
     ? retreatPoint
     : mouse;
 
-  ghost.x += (target.x - ghost.x) * 0.03;
-  ghost.y += (target.y - ghost.y) * 0.03;
+  ghost.x += (target.x - ghost.x) * 0.05;
+  ghost.y += (target.y - ghost.y) * 0.05;
 
   for (let p of particles) {
-    p.x += p.vx;
-    p.y += p.vy;
+    
 
     if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
     if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
@@ -173,23 +132,39 @@ function draw() {
 
   // Tentáculos conectando partículas ao perseguidor (sempre visíveis)
   for (let p of particles) {
-    const dx = ghost.x - p.x;
-    const dy = ghost.y - p.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-    if (dist < 180) {
+  const dx = ghost.x - p.x;
+  const dy = ghost.y - p.y;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  if (dist < 180) {
+    const rayCount = 3 + Math.floor(Math.random() * 3); // 3 a 5 raios por partícula
+
+    for (let i = 0; i < rayCount; i++) {
+      const offsetX = (Math.random() - 0.5) * 60;
+      const offsetY = (Math.random() - 0.5) * 60;
+
+      const cpX = (p.x + ghost.x) / 2 + offsetX;
+      const cpY = (p.y + ghost.y) / 2 + offsetY;
+
+      const pulse = 1 + Math.sin(Date.now() / 100 + i * 10) * 0.7;
+
       ctx.beginPath();
       ctx.moveTo(p.x, p.y);
-
-      const cpX = (p.x + ghost.x) / 2 + (Math.random() - 0.5) * 50;
-      const cpY = (p.y + ghost.y) / 2 + (Math.random() - 0.5) * 50;
-
-      const pulse = 1 + Math.sin(Date.now() / 200) * 0.5;
       ctx.quadraticCurveTo(cpX, cpY, ghost.x, ghost.y);
-      ctx.strokeStyle = "white";
-      ctx.lineWidth = 2.5 * pulse;
+
+      // Cor mutante tipo raio
+      const r = 255 + Math.floor(Math.random() * 55);
+      const g = 255;
+      const b = 255;
+      const alpha = 0.2 + Math.random() * 0.8;
+
+      ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+      ctx.lineWidth = 1.5 + Math.random() * 2.5;
+      ctx.shadowColor = " rgba(255, 255, 255, 0.8)";
+      ctx.shadowBlur = 15;
       ctx.stroke();
     }
   }
+}
 
   for (let i = 0; i < 5; i++) {
     const angle = Math.random() * Math.PI * 2;
@@ -200,14 +175,14 @@ function draw() {
     ctx.beginPath();
     ctx.moveTo(ghost.x, ghost.y);
     ctx.lineTo(endX, endY);
-    ctx.strokeStyle = "rgba(255, 0, 0, 0.6)";
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.6)";
     ctx.lineWidth = 2;
     ctx.stroke();
   }
 
   ctx.beginPath();
   ctx.arc(ghost.x, ghost.y, 12, 0, Math.PI * 2);
-  ctx.fillStyle = "rgba(255, 0, 0, 0.8)";
+  ctx.fillStyle = "rgba(255, 250, 255, 0.8)";
   ctx.shadowColor = "red";
   ctx.shadowBlur = 15;
   ctx.fill();
@@ -216,3 +191,4 @@ function draw() {
 }
 
 draw();
+
