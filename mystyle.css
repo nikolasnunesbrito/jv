@@ -1,17 +1,19 @@
-body{
+body {
   margin: 0;
   padding: 0;
   overflow: hidden;
   background: black;
   display: flex;
   justify-content: center;
-
 }
 
 canvas {
   position: fixed;
   top: 0;
   left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: block;
 }
 
 #content {
@@ -28,28 +30,14 @@ canvas {
   text-align: center;
 }
 
-@media (max-width: 480px) {
+/* Responsivo para celular */
+@media (max-width: 600px) {
   #content {
-    width: 95%;
-    margin-top: 40px;
+    width: 90%;
+    height: auto;
+    margin-top: 50px;
+    font-size: 1em;
     padding: 15px;
-    font-size: 16px;
-  }
-
-  input, button, textarea {
-    width: 100%;
-    font-size: 16px;
-    margin-bottom: 10px;
-  }
-
-  canvas {
-    width: 100vw;
-    height: 100vh;
-  }
-
-  body {
-    flex-direction: column;
-    align-items: center;
   }
 }
 
