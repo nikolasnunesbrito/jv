@@ -36,13 +36,16 @@ function calcular() {
     // Converte porcentagem: 10% → (10/100)
     let expr = expressao.replace(/(\d+(\.\d+)?)%/g, '($1/100)');
 
-    // Avalia a expressão
     const resultado = eval(expr);
+
+    // Salva no histórico como "expressão = resultado"
+    historico.push(`${expressao} = ${resultado}`);
+
     display.value = resultado;
     expressao = resultado.toString();
   } catch {
     display.value = "Erro";
-    expressao = "";
+    // Não salva no histórico se deu erro
   }
 }
 
@@ -58,6 +61,19 @@ document.addEventListener("keydown", function(event) {
     display.value = expressao;
     event.preventDefault();
   }
+});
+let historico = [];
+
+document.getElementById("historyBtn").addEventListener("click", () => {
+  const box = document.getElementById("historyBox");
+
+  if (historico.length === 0) {
+    box.innerHTML = "<em>Sem histórico ainda</em>";
+  } else {
+    box.innerHTML = "<strong>Histórico:</strong><br>" + historico.map((h, i) => `${i + 1}. ${h}`).join("<br>");
+  }
+
+  box.classList.toggle("visible");
 });
 
 
